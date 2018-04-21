@@ -27,7 +27,7 @@ namespace Engine::GL {
                 imgFormat = GL_RGBA;
                 break;
             default:
-                throw std::runtime_error("tried loading something with less than 4 channels? (grayscale?)");
+                throw std::runtime_error("tried loading something with less than 3 channels? (grayscale?)");
         }
 
         m_invWidth = 1.0f / m_width;

@@ -22,5 +22,8 @@ namespace Engine::GL {
 
         Mesh(const Mesh&) = delete;
         Mesh operator =(const Mesh&) = delete;
+
+        // This is a bad abstraction but I cba to build a better one
+        void Draw();
     };
 }

@@ -4,6 +4,19 @@
 
 #include "Video/Window.hpp"
 
+void GLDebugSink(
+        GLenum source,
+        GLenum type,
+        GLuint id,
+        GLenum severity,
+        GLsizei len,
+        const GLchar* message,
+        const void* userparam
+)
+{
+    fprintf(stderr, "%s\n", message);
+}
+
 namespace Engine::GL {
     Window::Window(
             const char* title,
@@ -48,6 +61,11 @@ namespace Engine::GL {
         }
 
         SDL_GL_SetSwapInterval(-1);
+
+#ifndef NDEBUG
+        glDebugMessageCallbackARB(GLDebugSink, nullptr);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+#endif
     }
 
     Window::~Window()
