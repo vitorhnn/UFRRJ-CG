@@ -147,6 +147,8 @@ namespace Engine::Util::ObjLoader {
         puts("done, I guess");
     }
 
+    /// Prepares a OBJModel for uploading
+    /// @returns A mesh in the GPU, containing the data in the obj model
     Engine::GL::Mesh OBJModel::Upload()
     {
         size_t idx = 0;
@@ -182,6 +184,7 @@ namespace Engine::Util::ObjLoader {
                 }
 
                 indices.push_back(idx);
+                indexMap[index] = idx;
                 idx++;
             } else {
                 indices.push_back(it->second);
@@ -198,11 +201,15 @@ namespace Engine::Util::ObjLoader {
                 auto ab = vertices[b] - vertices[a];
                 auto ac = vertices[c] - vertices[a];
 
-                auto cross = glm::normalize(glm::cross(ab, ac));
+                auto cross = glm::cross(ab, ac);
 
-                normals[a] = cross;
-                normals[b] = cross;
-                normals[c] = cross;
+                normals[a] += cross;
+                normals[b] += cross;
+                normals[c] += cross;
+            }
+
+            for (auto& normal : normals) {
+                normal = glm::normalize(normal);
             }
         }
 

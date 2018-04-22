@@ -43,6 +43,8 @@ namespace Engine::GL {
 
         void SetUniform(const std::string& uniform, const glm::vec3& vec);
 
+        void SetUniform(const std::string& uniform, const glm::mat3& mat);
+
         void SetUniform(const std::string& uniform, const glm::mat4& mat);
     };
 

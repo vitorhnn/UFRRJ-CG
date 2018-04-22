@@ -10,7 +10,8 @@ namespace Engine::Input {
         D,
         Mouse1,
         F1,
-        F2
+        F2,
+        Size
     };
 
     class IInputManager {
@@ -20,6 +21,8 @@ namespace Engine::Input {
         virtual void Update() = 0;
 
         virtual bool GetKeyState(Keys key) = 0;
+
+        virtual bool ConsumeKey(Keys Key) = 0;
 
         virtual void SetKeyState(Keys key, bool state) = 0;
 

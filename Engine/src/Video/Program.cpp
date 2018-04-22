@@ -57,6 +57,11 @@ namespace Engine::GL {
         glUniform3fv(GetUniformLocation(uniform), 1, glm::value_ptr(vec));
     }
 
+    void Program::SetUniform(const std::string& uniform, const glm::mat3& mat)
+    {
+        glUniformMatrix3fv(GetUniformLocation(uniform), 1, GL_FALSE, glm::value_ptr(mat));
+    }
+
     void Program::SetUniform(const std::string& uniform, const glm::mat4& mat)
     {
         glUniformMatrix4fv(GetUniformLocation(uniform), 1, GL_FALSE, glm::value_ptr(mat));
@@ -66,6 +71,7 @@ namespace Engine::GL {
     {
         // magically read from somewhere (hint hint, implement FS::)
         auto vec = Util::FS::ReadAllBytes(path);
+        vec.push_back('\0');
         const GLchar* source = vec.data();
 
         GLenum gltype;

@@ -31,6 +31,10 @@ namespace Engine::GL {
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
+#ifndef NDEBUG
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
+#endif
+
         if (msaa) {
             SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
             SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, msaa_samples);
@@ -63,9 +67,14 @@ namespace Engine::GL {
         SDL_GL_SetSwapInterval(-1);
 
 #ifndef NDEBUG
+        printf("debug build, enabling ARB_debug_output\n");
         glDebugMessageCallbackARB(GLDebugSink, nullptr);
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 #endif
+
+        printf("gl vendor: %s\n"
+               "gl version: %s\n"
+               "gl renderer: %s\n", glGetString(GL_VENDOR), glGetString(GL_VERSION), glGetString(GL_RENDERER));
     }
 
     Window::~Window()

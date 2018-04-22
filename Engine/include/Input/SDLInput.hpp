@@ -9,7 +9,7 @@
 
 namespace Engine::Input {
     class SDLInput final : public IInputManager {
-        std::array<bool, sizeof(Keys) + 1> KeyState;
+        std::array<bool, Keys::Size> KeyState;
 
         bool m_shouldQuit = false;
 
@@ -24,6 +24,8 @@ namespace Engine::Input {
         void Update() override;
 
         bool GetKeyState(Keys key) override;
+
+        bool ConsumeKey(Keys key) override;
 
         void SetKeyState(Keys key, bool state) override;
 

@@ -37,6 +37,12 @@ namespace Engine::Input {
                         case SDLK_d:
                             KeyState[Keys::D] = true;
                             break;
+                        case SDLK_F1:
+                            KeyState[Keys::F1] = true;
+                            break;
+                        case SDLK_F2:
+                            KeyState[Keys::F2] = true;
+                            break;
                         default:
                             break;
                     }
@@ -54,6 +60,12 @@ namespace Engine::Input {
                             break;
                         case SDLK_d:
                             KeyState[Keys::D] = false;
+                            break;
+                        case SDLK_F1:
+                            KeyState[Keys::F1] = false;
+                            break;
+                        case SDLK_F2:
+                            KeyState[Keys::F2] = false;
                             break;
                         default:
                             break;
@@ -101,6 +113,21 @@ namespace Engine::Input {
     bool SDLInput::GetKeyState(Keys key)
     {
         return KeyState[key];
+    }
+
+    /// Returns the current value of a key, setting it to false
+    /// @param key The key to query
+    /// @returns The state of the key
+    bool SDLInput::ConsumeKey(Keys key)
+    {
+        bool val = KeyState[key];
+
+        if (val) {
+            printf("ayy lmao\n");
+        }
+
+        KeyState[key] = false;
+        return val;
     }
 
     void SDLInput::SetKeyState(Keys key, bool state)
