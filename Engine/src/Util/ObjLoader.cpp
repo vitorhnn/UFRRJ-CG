@@ -79,15 +79,15 @@ namespace Engine::Util::ObjLoader {
             auto components = Tokenize(component, '/');
 
             Index idx;
-            idx.vertex = static_cast<unsigned>(std::stoul(components[0]));
+            idx.vertex = static_cast<unsigned>(std::stoul(components[0])) - 1;
             idx.uv = 0;
             idx.normal = 0;
 
             if (components.size() > 1) {
-                idx.uv = static_cast<unsigned>(std::stoul(components[1]));
+                idx.uv = static_cast<unsigned>(std::stoul(components[1])) - 1;
 
                 if (components.size() > 2) {
-                    idx.normal = static_cast<unsigned>(std::stoul(components[2]));
+                    idx.normal = static_cast<unsigned>(std::stoul(components[2])) - 1;
                 }
             }
 
@@ -112,8 +112,8 @@ namespace Engine::Util::ObjLoader {
                 switch (line.at(0)) {
                     case 'v': {
                         switch (line.at(1)) {
-                            [[fallthrough]]
                             case ' ':
+                                [[fallthrough]];
                             case '\t':
                                 m_vertices.emplace_back(ReadVertex3(line));
                                 break;
@@ -147,10 +147,45 @@ namespace Engine::Util::ObjLoader {
         puts("done, I guess");
     }
 
+    void OBJModel::GenerateNormals()
+    {
+        m_normals.resize(m_vertices.size());
+
+        for (auto& index : m_indices) {
+            m_normals[index.vertex] = {0.0f, 0.0f, 0.0f};
+            index.normal = index.vertex;
+        }
+
+        for (size_t i = 2; i < m_indices.size(); i += 3) {
+            auto c = m_indices[i],
+                 b = m_indices[i - 1],
+                 a = m_indices[i - 2];
+
+            auto ab = m_vertices[b.vertex] - m_vertices[a.vertex];
+            auto ac = m_vertices[c.vertex] - m_vertices[a.vertex];
+
+            auto cross = glm::cross(ab, ac);
+
+            m_normals[a.normal] += cross;
+            m_normals[b.normal] += cross;
+            m_normals[c.normal] += cross;
+        }
+
+        for (auto& normal : m_normals) {
+            normal = glm::normalize(normal);
+        }
+
+        m_hasNormals = true;
+    }
+
     /// Prepares a OBJModel for uploading
     /// @returns A mesh in the GPU, containing the data in the obj model
     Engine::GL::Mesh OBJModel::Upload()
     {
+        if (!m_hasNormals) {
+            GenerateNormals();
+        }
+
         size_t idx = 0;
         std::vector<glm::vec3> vertices;
         std::vector<glm::vec3> normals;
@@ -169,18 +204,18 @@ namespace Engine::Util::ObjLoader {
             return res;
         };
 
-        std::unordered_map<Index, size_t, decltype(hasher)> indexMap(10, hasher);
+        std::unordered_map<Index, size_t, decltype(hasher)> indexMap(1000, hasher);
 
         for (const auto& index : m_indices) {
             if (auto it = indexMap.find(index); it == indexMap.end()) {
-                vertices.push_back(m_vertices[index.vertex - 1]);
+                vertices.push_back(m_vertices[index.vertex]);
 
-                auto normal = m_hasNormals ? m_normals[index.normal - 1] : glm::vec3(0.0f, 0.0f, 0.0f);
+                auto normal = m_hasNormals ? m_normals[index.normal] : glm::vec3(0.0f, 0.0f, 0.0f);
 
                 normals.push_back(normal);
 
                 if (m_hasUVs) {
-                    uvs.push_back(m_uvs[index.uv - 1]);
+                    uvs.push_back(m_uvs[index.uv]);
                 }
 
                 indices.push_back(idx);
@@ -188,28 +223,6 @@ namespace Engine::Util::ObjLoader {
                 idx++;
             } else {
                 indices.push_back(it->second);
-            }
-        }
-
-        if (!m_hasNormals) {
-            // unsmoothed normal calculation
-            for (size_t i = 0; i < indices.size(); i += 3) {
-                auto a = indices[i],
-                     b = indices[i + 1],
-                     c = indices[i + 2];
-
-                auto ab = vertices[b] - vertices[a];
-                auto ac = vertices[c] - vertices[a];
-
-                auto cross = glm::cross(ab, ac);
-
-                normals[a] += cross;
-                normals[b] += cross;
-                normals[c] += cross;
-            }
-
-            for (auto& normal : normals) {
-                normal = glm::normalize(normal);
             }
         }
 

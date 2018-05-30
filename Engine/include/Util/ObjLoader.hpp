@@ -35,5 +35,7 @@ namespace Engine::Util::ObjLoader {
         explicit OBJModel(const std::string& fileData);
 
         Engine::GL::Mesh Upload();
+
+        void GenerateNormals();
     };
 }
