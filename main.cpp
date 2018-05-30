@@ -43,7 +43,7 @@ int main()
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1280.0f / 720.0f, 0.1f, 100.0f);
     prog.SetUniform("projection", projection);
 
-    glm::mat4 model;
+    auto model = glm::mat4(1.0f);
     model = glm::scale(model, {0.5f, 0.5f, 0.5f});
     prog.SetUniform("model", model);
 
