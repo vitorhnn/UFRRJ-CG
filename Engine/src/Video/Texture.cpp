@@ -30,10 +30,8 @@ namespace Engine::GL {
                 throw std::runtime_error("tried loading something with less than 3 channels? (grayscale?)");
         }
 
-        m_invWidth = 1.0f / m_width;
-        m_invHeight = 1.0f / m_height;
-
         glGenTextures(1, &m_id);
+        printf("generated texture with id %u, name %s\n", m_id, path);
         glBindTexture(GL_TEXTURE_2D, m_id);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_width, m_height, 0, imgFormat, GL_UNSIGNED_BYTE, bytes);
 
@@ -50,6 +48,11 @@ namespace Engine::GL {
 
     Texture::~Texture()
     {
+        if (m_id == 0) {
+            return;
+        }
+
+        printf("texture id %u is dying\n", m_id);
         glDeleteTextures(1, &m_id);
     }
 
@@ -57,5 +60,10 @@ namespace Engine::GL {
     {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, m_id);
+    }
+
+    void Texture::Unbind()
+    {
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 }

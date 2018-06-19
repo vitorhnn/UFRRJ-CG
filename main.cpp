@@ -34,23 +34,31 @@ int main()
     prog.AttachShader("GLSL/simple_mesh.vert", GL::ShaderType::Vertex);
     prog.AttachShader("GLSL/simple_mesh.frag", GL::ShaderType::Fragment);
     prog.Link();
-    prog.Use();
 
-    auto data = Util::FS::ReadAllBytes("bosta.obj");
+    GL::Program lampProgram;
+    lampProgram.AttachShader("GLSL/simple_mesh.vert", GL::ShaderType::Vertex);
+    lampProgram.AttachShader("GLSL/fullbright.frag", GL::ShaderType::Fragment);
+    lampProgram.Link();
+
+    auto data = Util::FS::ReadAllBytes("nanosuit.obj");
     data.push_back('\0'); // had some weird issues with null terminators, push one just for safety sake
-    auto mesh = Util::ObjLoader::OBJModel(std::string{data.begin(), data.end()}).Upload();
+    auto nanosuit = Util::ObjLoader::OBJModel(std::string{data.begin(), data.end()}).Upload();
+
+    data = Util::FS::ReadAllBytes("cube.obj");
+    data.push_back('\0');
+    auto cube = Util::ObjLoader::OBJModel(std::string{data.begin(), data.end()}).Upload();
+
 
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1280.0f / 720.0f, 0.1f, 100.0f);
-    prog.SetUniform("projection", projection);
 
     auto model = glm::mat4(1.0f);
     model = glm::scale(model, {0.5f, 0.5f, 0.5f});
-    prog.SetUniform("model", model);
 
     auto invModel = glm::inverseTranspose(glm::mat3(model));
-    prog.SetUniform("invModel", invModel);
 
     auto camera = FlyCamera();
+
+    auto lightPos = glm::vec3(5.0f, 0.0f, 0.0f);
 
     while (!ipt.IsQuitRequested()) {
         ipt.Update();
@@ -63,6 +71,13 @@ int main()
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        prog.Use();
+        prog.SetUniform("projection", projection);
+        prog.SetUniform("objColor", glm::vec3{0.3f, 0.6f, 0.1f});
+        prog.SetUniform("lightColor", glm::vec3{1.0f, 1.0f, 1.0f});
+        prog.SetUniform("lightPos", lightPos);
+        prog.SetUniform("viewPos", camera.GetPosition());
+
         camera.Update(ipt);
         prog.SetUniform("view", camera.GetViewMatrix());
 
@@ -72,7 +87,17 @@ int main()
         invModel = glm::inverseTranspose(glm::mat3(rotmodel));
         prog.SetUniform("invModel", invModel);
 
-        mesh.Draw();
+        nanosuit.Draw();
+
+        lampProgram.Use();
+        lampProgram.SetUniform("projection", projection);
+        lampProgram.SetUniform("view", camera.GetViewMatrix());
+        auto cubeModel = glm::translate(glm::mat4(1), lightPos);
+        cubeModel = glm::scale(cubeModel, {0.5f, 0.5f, 0.5f});
+        lampProgram.SetUniform("model", cubeModel);
+
+        cube.Draw();
+
 
         w.Present();
     }

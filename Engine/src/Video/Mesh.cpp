@@ -1,5 +1,6 @@
 #include "Video/Mesh.hpp"
 
+#include <optional>
 
 namespace Engine::GL {
     Mesh::Mesh(
@@ -7,7 +8,13 @@ namespace Engine::GL {
             , const std::vector<glm::vec2>& uv
             , const std::vector<glm::vec3>& normal
             , const std::vector<uint32_t>&  index
+            , Texture* diffuse
+            , Texture* specular
+            , Texture* bumpmap
     ) : m_drawCount(index.size())
+        , m_diffuse(diffuse)
+        , m_specular(specular)
+        , m_bumpmap(bumpmap)
     {
         // TODO: std::optional<std::vector<glm::vec3>>> ?
         bool hasUV = !uv.empty();
@@ -91,6 +98,9 @@ namespace Engine::GL {
 
     void Mesh::Draw()
     {
+        if (m_diffuse != nullptr) {
+            m_diffuse->Bind();
+        }
         glBindVertexArray(m_vao);
         glDrawElements(GL_TRIANGLES, m_drawCount, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);

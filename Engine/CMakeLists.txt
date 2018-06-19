@@ -10,6 +10,7 @@ add_library(
         src/Video/Window.cpp
         src/Video/Texture.cpp
         src/Video/Mesh.cpp
+        src/Video/Model.cpp
 
         src/Util/ObjLoader.cpp
 

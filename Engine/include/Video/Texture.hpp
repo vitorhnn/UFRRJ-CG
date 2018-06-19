@@ -13,10 +13,20 @@ namespace Engine::GL {
         Texture(const Texture&) = delete;
         Texture& operator= (const Texture&) = delete;
 
+        Texture(Texture&& other)
+        {
+            // GL is kind of a piece of shit, therefore we need to move the ID out so it doesn't double free
+            m_id = other.m_id;
+            other.m_id = 0;
+
+            m_width = other.m_width;
+            m_height = other.m_height;
+        }
+
         int m_width, m_height;
 
-        float m_invWidth, m_invHeight;
-
         void Bind();
+
+        void Unbind();
     };
 }
