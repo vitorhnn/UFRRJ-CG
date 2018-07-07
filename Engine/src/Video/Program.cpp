@@ -89,6 +89,15 @@ namespace Engine::GL {
         glShaderSource(id, 1, &source, nullptr);
         glCompileShader(id);
 
+        GLint compiled;
+        glGetShaderiv(id, GL_COMPILE_STATUS, &compiled);
+        if (compiled != GL_TRUE) {
+            GLsizei sz;
+            GLchar message[1024];
+            glGetShaderInfoLog(id, 1024, &sz, message);
+            throw std::runtime_error(std::string("Shader compilation failed") + message);
+        }
+
         glAttachShader(m_glid, id);
         glDeleteShader(id);
     }

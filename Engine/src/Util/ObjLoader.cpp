@@ -113,9 +113,11 @@ namespace Engine::Util::ObjLoader {
             , std::vector<glm::vec3>& vertices
             , std::vector<glm::vec3>& normals
             , std::vector<glm::vec2>& uvs
+            , std::vector<glm::vec3>& tangents
     ) :   m_vertices(vertices)
         , m_normals(normals)
         , m_uvs(uvs)
+        , m_tangents(tangents)
     {
         for (const auto& line : lines) {
             try {
@@ -179,6 +181,11 @@ namespace Engine::Util::ObjLoader {
         m_hasNormals = true;
     }
 
+    void OBJModel::OBJMesh::GenerateTangents()
+    {
+        m_tangents.resize(m_vertices.size());
+    }
+
     /// Prepares a OBJModel for uploading
     /// @returns A mesh in the GPU, containing the data in the obj model
     Engine::GL::Mesh OBJModel::OBJMesh::Upload(GL::Texture* diffuse, GL::Texture* specular, GL::Texture* bump)
@@ -227,7 +234,8 @@ namespace Engine::Util::ObjLoader {
             }
         }
 
-        return Engine::GL::Mesh(vertices, uvs, normals, indices, diffuse, specular, bump);
+        std::vector<glm::vec3> fakeTangents;
+        return Engine::GL::Mesh(vertices, uvs, normals, fakeTangents, indices, diffuse, specular, bump);
     }
 
     void OBJModel::ParseMtl(const std::string& path)
@@ -293,7 +301,7 @@ namespace Engine::Util::ObjLoader {
 
                     auto spliced = std::vector(lines.data() + i + 1, lines.data() + j);
 
-                    m_meshes.emplace_back(OBJMesh{spliced, m_vertices, m_normals, m_uvs});
+                    m_meshes.emplace_back(OBJMesh{spliced, m_vertices, m_normals, m_uvs, m_tangents});
                 }
             } catch (const std::out_of_range& ex) {
                 // nada
@@ -331,7 +339,7 @@ namespace Engine::Util::ObjLoader {
             if (!mtl.specularMap.empty()) {
                 __textures.try_emplace(
                         mtl.specularMap,
-                        std::move(GL::Texture{mtl.diffuseMap.c_str()})
+                        std::move(GL::Texture{mtl.specularMap.c_str()})
                 );
             }
 

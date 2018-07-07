@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.7)
 project(engine)
 
 find_package(SDL2 REQUIRED)
+find_package(ASSIMP REQUIRED)
 
 add_library(
         engine
@@ -13,6 +14,7 @@ add_library(
         src/Video/Model.cpp
 
         src/Util/ObjLoader.cpp
+        src/Util/AssimpLoader.cpp
 
         src/Input/SDLInput.cpp
 )
@@ -22,10 +24,12 @@ target_link_libraries(
         glad
         stb_image
         SDL2::SDL2
+        ${ASSIMP_INCLUDE_DIRS}
 )
 
 target_include_directories(
         engine PUBLIC
         include
         SDL2::SDL2
+        ${ASSIMP_LIBRARIES}
 )

@@ -25,7 +25,7 @@ namespace Engine::GL {
 
         int m_width, m_height;
 
-        void Bind();
+        void Bind(unsigned unit);
 
         void Unbind();
     };

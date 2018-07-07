@@ -23,6 +23,7 @@ namespace Engine::GL {
                   const std::vector<glm::vec3>& pos
                 , const std::vector<glm::vec2>& uv
                 , const std::vector<glm::vec3>& normal
+                , const std::vector<glm::vec3>& tangents
                 , const std::vector<uint32_t>& index
                 , Texture* diffuse
                 , Texture* specular

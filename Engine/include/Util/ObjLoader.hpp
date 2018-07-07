@@ -27,6 +27,7 @@ namespace Engine::Util::ObjLoader {
                     , std::vector<glm::vec3>& vertices
                     , std::vector<glm::vec3>& normals
                     , std::vector<glm::vec2>& uvs
+                    , std::vector<glm::vec3>& tangents
             );
 
 
@@ -35,6 +36,7 @@ namespace Engine::Util::ObjLoader {
             std::vector<glm::vec3>& m_vertices;
             std::vector<glm::vec3>& m_normals;
             std::vector<glm::vec2>& m_uvs;
+            std::vector<glm::vec3>& m_tangents;
             std::vector<Index> m_indices;
 
             bool m_hasUVs = false;
@@ -43,6 +45,8 @@ namespace Engine::Util::ObjLoader {
             void ReadIndex(const std::string& line);
 
             void GenerateNormals();
+
+            void GenerateTangents();
 
             Engine::GL::Mesh Upload(GL::Texture* diffuse, GL::Texture* specular, GL::Texture* bump);
         };
@@ -64,6 +68,7 @@ namespace Engine::Util::ObjLoader {
         std::vector<glm::vec3> m_vertices;
         std::vector<glm::vec3> m_normals;
         std::vector<glm::vec2> m_uvs;
+        std::vector<glm::vec3> m_tangents;
 
         std::vector<Material> m_materials;
 

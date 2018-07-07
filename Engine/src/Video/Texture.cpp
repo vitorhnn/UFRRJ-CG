@@ -34,11 +34,12 @@ namespace Engine::GL {
         printf("generated texture with id %u, name %s\n", m_id, path);
         glBindTexture(GL_TEXTURE_2D, m_id);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_width, m_height, 0, imgFormat, GL_UNSIGNED_BYTE, bytes);
+        glGenerateMipmap(GL_TEXTURE_2D);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -56,9 +57,9 @@ namespace Engine::GL {
         glDeleteTextures(1, &m_id);
     }
 
-    void Texture::Bind()
+    void Texture::Bind(unsigned unit)
     {
-        glActiveTexture(GL_TEXTURE0);
+        glActiveTexture(GL_TEXTURE0 + unit);
         glBindTexture(GL_TEXTURE_2D, m_id);
     }
 

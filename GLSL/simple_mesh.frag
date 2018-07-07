@@ -7,6 +7,7 @@ in vec2 uv;
 out vec4 color;
 
 uniform sampler2D diffuseMap;
+uniform sampler2D specularMap;
 uniform vec3 lightColor;
 uniform vec3 lightPos;
 uniform vec3 viewPos;
@@ -14,9 +15,9 @@ uniform vec3 viewPos;
 vec3 ambient()
 {
     float ambientMod = 0.1;
-    vec3 ambient = ambientMod * lightColor;
+    vec3 ambient = ambientMod * lightColor * texture(diffuseMap, uv).rgb;
 
-    return vec3(0.0);
+    return ambient;
 }
 
 vec3 diffuse()
@@ -29,15 +30,13 @@ vec3 diffuse()
 
 vec3 specular()
 {
-    float specMod = 1.0;
-
     vec3 lightDir = normalize(lightPos - fragPos);
     vec3 viewDir = normalize(viewPos - fragPos);
     vec3 reflectDir = reflect(-lightDir, normalize(normal));
 
     float specStr = pow(max(dot(viewDir, reflectDir), 0.0), 96);
 
-    vec3 specular = specMod * specStr * lightColor;
+    vec3 specular = specStr * lightColor * texture(specularMap, uv).rgb;
 
     return specular;
 }
