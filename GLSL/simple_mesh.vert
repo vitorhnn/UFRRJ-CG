@@ -1,5 +1,7 @@
 #version 330 core
 
+// vertex shader: forward rendered phong with diffuse and specular mapping, single light source
+
 layout (location = 0) in vec3 pos;
 layout (location = 1) in vec2 iUV;
 layout (location = 2) in vec3 norm;

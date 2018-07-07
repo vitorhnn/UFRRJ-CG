@@ -15,10 +15,13 @@ out vec4 color;
 uniform sampler2D diffuseMap;
 uniform sampler2D specularMap;
 uniform sampler2D normalMap;
+uniform sampler2D depthMap;
 
 uniform vec3 lightColor;
 
-vec3 ambient()
+uniform float heightScale;
+
+vec3 ambient(vec2 uv)
 {
     float ambientMod = 0.1;
     vec3 ambient = ambientMod * lightColor * texture(diffuseMap, fs_in.uv).rgb;
@@ -26,7 +29,7 @@ vec3 ambient()
     return ambient;
 }
 
-vec3 diffuse(vec3 normal)
+vec3 diffuse(vec2 uv, vec3 normal)
 {
     vec3 lightDir = normalize(fs_in.tLightPos - fs_in.tFragPos);
     float diffStr = max(dot(lightDir, normal), 0.0);
@@ -34,7 +37,7 @@ vec3 diffuse(vec3 normal)
     return diffStr * lightColor * texture(diffuseMap, fs_in.uv).rgb;
 }
 
-vec3 specular(vec3 normal)
+vec3 specular(vec2 uv, vec3 normal)
 {
     vec3 lightDir = normalize(fs_in.tLightPos - fs_in.tFragPos);
     vec3 viewDir = normalize(fs_in.tViewPos - fs_in.tFragPos);
@@ -47,15 +50,25 @@ vec3 specular(vec3 normal)
     return specular;
 }
 
+vec2 parallax()
+{
+    vec3 viewDir = normalize(fs_in.tLightPos - fs_in.tFragPos);
+    float height = texture(depthMap, fs_in.uv).r;
+    vec2 p = viewDir.xy / viewDir.z * (height * heightPower);
+
+    return fs_in.uv - p;
+}
+
 void main()
 {
+    vec2 modifiedUv = parallax();
     // sample from the normal map
     vec3 normal = texture(normalMap, fs_in.uv).rgb;
 
     // map to [-1, 1]
     normal = normalize(normal * 2.0 - 1.0);
 
-    vec3 result = ambient() + diffuse(normal) + specular(normal);
+    vec3 result = ambient(modifiedUv) + diffuse(modifiedUv, normal) + specular(modifiedUv, normal);
 
     color = vec4(result, 1.0);
 }

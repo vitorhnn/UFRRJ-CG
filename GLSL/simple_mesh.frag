@@ -1,5 +1,7 @@
 #version 330 core
 
+// fragment shader: forward rendered phong with diffuse and specular mapping, single light source
+
 in vec3 normal;
 in vec3 fragPos;
 in vec2 uv;
