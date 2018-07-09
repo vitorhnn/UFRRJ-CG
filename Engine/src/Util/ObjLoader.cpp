@@ -235,7 +235,7 @@ namespace Engine::Util::ObjLoader {
         }
 
         std::vector<glm::vec3> fakeTangents;
-        return Engine::GL::Mesh(vertices, uvs, normals, fakeTangents, indices, diffuse, specular, bump);
+        return Engine::GL::Mesh(vertices, uvs, normals, fakeTangents, indices, diffuse, specular, bump, nullptr);
     }
 
     void OBJModel::ParseMtl(const std::string& path)

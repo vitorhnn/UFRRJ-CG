@@ -34,9 +34,10 @@ namespace Engine::Util::AssimpLoader {
 
         std::vector<unsigned> indices;
 
-        Texture *diffuseMap = nullptr;
-        Texture *specularMap = nullptr;
-        Texture *normalMap = nullptr;
+        Texture* diffuseMap = nullptr;
+        Texture* specularMap = nullptr;
+        Texture* normalMap = nullptr;
+        Texture* displacementMap = nullptr;
 
         for (size_t i = 0; i < mesh->mNumVertices; ++i) {
             auto vertex = mesh->mVertices[i];
@@ -84,9 +85,15 @@ namespace Engine::Util::AssimpLoader {
                 mtl->GetTexture(aiTextureType_NORMALS, 0, &str);
                 normalMap = LoadTexture(str.C_Str());
             }
+
+            if (mtl->GetTextureCount(aiTextureType_DISPLACEMENT) == 1) {
+                aiString str;
+                mtl->GetTexture(aiTextureType_DISPLACEMENT, 0, &str);
+                displacementMap = LoadTexture(str.C_Str());
+            }
         }
 
-        return Mesh(vertices, uvs, normals, tangents, indices, diffuseMap, specularMap, normalMap);
+        return Mesh(vertices, uvs, normals, tangents, indices, diffuseMap, specularMap, normalMap, displacementMap);
     }
 
     static void ProcessNode(const aiScene* scene, aiNode* node, std::vector<Mesh>& meshes)

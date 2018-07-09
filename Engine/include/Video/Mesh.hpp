@@ -16,6 +16,7 @@ namespace Engine::GL {
         Texture* m_diffuse;
         Texture* m_specular;
         Texture* m_bumpmap;
+        Texture* m_displacementMap;
 
         size_t m_drawCount;
     public:
@@ -28,6 +29,7 @@ namespace Engine::GL {
                 , Texture* diffuse
                 , Texture* specular
                 , Texture* bumpmap
+                , Texture* displacementMap
         );
 
         Mesh(const Mesh&) = delete;

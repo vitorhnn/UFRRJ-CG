@@ -28,5 +28,7 @@ namespace Engine::GL {
         void Bind(unsigned unit);
 
         void Unbind();
+
+        static void BindNull(unsigned unit);
     };
 }

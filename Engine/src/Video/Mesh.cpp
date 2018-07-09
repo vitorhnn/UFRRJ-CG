@@ -12,10 +12,12 @@ namespace Engine::GL {
             , Texture* diffuse
             , Texture* specular
             , Texture* bumpmap
+            , Texture* displacementMap
     ) : m_drawCount(index.size())
         , m_diffuse(diffuse)
         , m_specular(specular)
         , m_bumpmap(bumpmap)
+        , m_displacementMap(displacementMap)
     {
         // TODO: std::optional<std::vector<glm::vec3>>> ?
         bool hasUV = !uv.empty();
@@ -115,14 +117,26 @@ namespace Engine::GL {
     {
         if (m_diffuse != nullptr) {
             m_diffuse->Bind(0);
+        } else {
+            Texture::BindNull(0);
         }
 
         if (m_specular != nullptr) {
             m_specular->Bind(1);
+        } else {
+            Texture::BindNull(1);
         }
 
         if (m_bumpmap != nullptr) {
             m_bumpmap->Bind(2);
+        } else {
+            Texture::BindNull(2);
+        }
+
+        if (m_displacementMap != nullptr) {
+            m_displacementMap->Bind(3);
+        } else {
+            Texture::BindNull(3);
         }
 
         glBindVertexArray(m_vao);

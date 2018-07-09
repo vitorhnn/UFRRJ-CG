@@ -30,7 +30,7 @@ int main()
     GL::Window w("ufrrj", 1920, 1080, true, 4);
     Input::SDLInput ipt;
 
-    auto mouseLock = true;
+    auto mouseLock = false;
     SDL_SetRelativeMouseMode(static_cast<SDL_bool>(mouseLock));
 
     glEnable(GL_DEPTH_TEST);
@@ -45,16 +45,25 @@ int main()
     prog2.AttachShader("GLSL/simple_mesh.frag", GL::ShaderType::Fragment);
     prog2.Link();
 
-    GL::Program *mainProg = &prog;
+    GL::Program* mainProg = &prog;
 
     GL::Program lampProgram;
     lampProgram.AttachShader("GLSL/simple_mesh.vert", GL::ShaderType::Vertex);
     lampProgram.AttachShader("GLSL/fullbright.frag", GL::ShaderType::Fragment);
     lampProgram.Link();
 
+    GL::Program parallaxProgram;
+    parallaxProgram.AttachShader("GLSL/bumpmapped_mesh.vert", GL::ShaderType::Vertex);
+    parallaxProgram.AttachShader("GLSL/parallaxmapped_mesh.frag", GL::ShaderType::Fragment);
+    parallaxProgram.Link();
+
+    GL::Program* parallaxPointer = &parallaxProgram;
+
     auto nanosuit = Util::AssimpLoader::LoadModel("cyborg.obj");
 
     auto cube = Util::AssimpLoader::LoadModel("cube.obj");
+
+    auto tex_cube = Util::AssimpLoader::LoadModel("tex_cube.obj");
 
 
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1280.0f / 720.0f, 0.1f, 100.0f);
@@ -78,9 +87,13 @@ int main()
 
         if (ipt.ConsumeKey(Input::Keys::F2)) {
             if (mainProg == &prog) {
+                printf("simple\n");
                 mainProg = &prog2;
+                parallaxPointer = &prog;
             } else {
+                printf("parallax\n");
                 mainProg = &prog;
+                parallaxPointer = &parallaxProgram;
             }
         }
 
@@ -105,8 +118,28 @@ int main()
 
         invModel = glm::inverseTranspose(glm::mat3(rotmodel));
         mainProg->SetUniform("invModel", invModel);
-
         nanosuit.Draw();
+
+        parallaxPointer->Use();
+        parallaxPointer->SetUniform("projection", projection);
+        parallaxPointer->SetUniform("objColor", glm::vec3{0.3f, 0.6f, 0.1f});
+        parallaxPointer->SetUniform("lightColor", glm::vec3{1.0f, 1.0f, 1.0f});
+        parallaxPointer->SetUniform("lightPos", lightPos);
+        parallaxPointer->SetUniform("viewPos", camera.GetPosition());
+        parallaxPointer->SetUniform("view", camera.GetViewMatrix());
+        parallaxPointer->SetUniform("heightScale", 0.1f);
+        parallaxPointer->SetUniform("diffuseMap", 0);
+        parallaxPointer->SetUniform("specularMap", 1);
+        parallaxPointer->SetUniform("normalMap", 2);
+        parallaxPointer->SetUniform("depthMap", 3);
+
+        auto mdl = glm::mat4(1.0f);
+        mdl = glm::translate(mdl, {3.0f, 1.5f, 0.0f});
+        mdl = glm::rotate(mdl, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        parallaxPointer->SetUniform("model", mdl);
+        parallaxPointer->SetUniform("invModel", glm::inverseTranspose(glm::mat3(mdl)));
+
+        tex_cube.Draw();
 
         lampProgram.Use();
         lampProgram.SetUniform("projection", projection);

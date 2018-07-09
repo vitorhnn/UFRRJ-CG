@@ -67,4 +67,10 @@ namespace Engine::GL {
     {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
+
+    void Texture::BindNull(unsigned unit)
+    {
+        glActiveTexture(GL_TEXTURE0 + unit);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
 }
