@@ -43,6 +43,9 @@ namespace Engine::Input {
                         case SDLK_F2:
                             KeyState[Keys::F2] = true;
                             break;
+                        case SDLK_F3:
+                            KeyState[Keys::F3] = true;
+                            break;
                         default:
                             break;
                     }
@@ -66,6 +69,9 @@ namespace Engine::Input {
                             break;
                         case SDLK_F2:
                             KeyState[Keys::F2] = false;
+                            break;
+                        case SDLK_F3:
+                            KeyState[Keys::F3] = false;
                             break;
                         default:
                             break;
@@ -121,10 +127,6 @@ namespace Engine::Input {
     bool SDLInput::ConsumeKey(Keys key)
     {
         bool val = KeyState[key];
-
-        if (val) {
-            printf("ayy lmao\n");
-        }
 
         KeyState[key] = false;
         return val;

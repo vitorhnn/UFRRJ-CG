@@ -27,7 +27,7 @@ int main()
 
     Assimp::DefaultLogger::create("", Assimp::Logger::LogSeverity::VERBOSE, aiDefaultLogStream_STDERR);
 
-    GL::Window w("ufrrj", 1920, 1080, true, 4);
+    GL::Window w("ufrrj", 1920, 1080, true, true, 4);
     Input::SDLInput ipt;
 
     auto mouseLock = false;
@@ -77,6 +77,7 @@ int main()
 
     auto lightPos = glm::vec3(5.0f, 0.0f, 0.0f);
 
+    int technique = 0;
     while (!ipt.IsQuitRequested()) {
         ipt.Update();
 
@@ -87,14 +88,16 @@ int main()
 
         if (ipt.ConsumeKey(Input::Keys::F2)) {
             if (mainProg == &prog) {
-                printf("simple\n");
                 mainProg = &prog2;
                 parallaxPointer = &prog;
             } else {
-                printf("parallax\n");
                 mainProg = &prog;
                 parallaxPointer = &parallaxProgram;
             }
+        }
+
+        if (ipt.ConsumeKey(Input::Keys::F3)) {
+            technique = (technique + 1) % 3;
         }
 
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -132,6 +135,7 @@ int main()
         parallaxPointer->SetUniform("specularMap", 1);
         parallaxPointer->SetUniform("normalMap", 2);
         parallaxPointer->SetUniform("depthMap", 3);
+        parallaxPointer->SetUniform("parallaxSwitch", technique);
 
         auto mdl = glm::mat4(1.0f);
         mdl = glm::translate(mdl, {3.0f, 1.5f, 0.0f});

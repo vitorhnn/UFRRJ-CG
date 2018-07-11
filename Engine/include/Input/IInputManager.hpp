@@ -11,6 +11,7 @@ namespace Engine::Input {
         Mouse1,
         F1,
         F2,
+        F3,
         Size
     };
 
